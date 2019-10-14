@@ -45,5 +45,11 @@
             <artifactId>mongo-spark-connector_2.11</artifactId>
             <version>2.4.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-graphx_2.10</artifactId>
+            <version>1.5.1</version>
+        </dependency>
     </dependencies>
 </project>
