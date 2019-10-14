@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * KDA = (k+a)/d (如果d==0则d=1)
- * 权重 = (（KDA + （cs/100 + wards）*0.6） * (1(win)|0.75(lose)) )/场次
+ * 权重 = (（KDA + （cs/100 + wards）*0.6） * (1(win)|0.75(lose)) )/(场次^0.97)
  */
 public class Computer {
 
@@ -58,7 +58,8 @@ public class Computer {
                         HashMap.Entry pEntry = (HashMap.Entry) pIt.next();
                         String posString = (String)pEntry.getKey();
                         List<Double> metricList = (List<Double>)pEntry.getValue();
-                        double metric = metricList.stream().mapToDouble(Double::byteValue).average().getAsDouble();
+                        double metric = metricList.stream().mapToDouble(Double::byteValue).summaryStatistics().getSum();
+                        metric = metric / Math.pow(metricList.size(),0.97);
                         posAttris.add(new PosAttri(posString,metric));
                     }
                    championAttriList.add(new ChampionAttri(championName,posAttris));
