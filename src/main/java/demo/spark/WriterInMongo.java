@@ -31,12 +31,13 @@ public class WriterInMongo {
                     fromProviders(PojoCodecProvider.builder().automatic(true).build()));
              */
 
+            /*
             MongoDBUtil.creatCollection("baseTOP_graph");
             MongoDBUtil.creatCollection("baseJUG_graph");
             MongoDBUtil.creatCollection("baseMID_graph");
             MongoDBUtil.creatCollection("baseADC_graph");
             MongoDBUtil.creatCollection("baseSUP_graph");
-            List<Document> documents = new ArrayList<>();
+
 
             List<Document> documentsTOP = new ArrayList<>();
             List<Document> documentsJUG = new ArrayList<>();
@@ -44,6 +45,10 @@ public class WriterInMongo {
             List<Document> documentsADC = new ArrayList<>();
             List<Document> documentsSUP = new ArrayList<>();
 
+            */
+
+            MongoDBUtil.creatCollection("base_graph");
+            List<Document> documents = new ArrayList<>();
 
             Iterator it = chamMap.entrySet().iterator();
             while (it.hasNext()){
@@ -69,31 +74,17 @@ public class WriterInMongo {
                 for(ChampionAttri championAttri:championAttriList){
                     String chamName = championAttri.getChampion_name();
                     List<PosAttri> posAttriList = championAttri.getPosAttriList();
+                    Long chamID = championAttri.getChampionID();
                     for(PosAttri posAttri:posAttriList){
-                        Document documentPos = new Document("sid",player._1()).append("sname",player._2()).append("cname",chamName).append("pos",posAttri.getPos()).append("metric",posAttri.getMetric());
-                        switch (posAttri.getPos()){
-                            case "打野":
-                                documentsJUG.add(documentPos);
-                                break;
-                            case "辅助":
-                                documentsSUP.add(documentPos);
-                                break;
-                            case "中单":
-                                documentsMID.add(documentPos);
-                                break;
-                            case "上单":
-                                documentsTOP.add(documentPos);
-                                break;
-                            case "下路":
-                                documentsADC.add(documentPos);
-                                break;
-                        }
+                        Document documentPos = new Document("sid",player._1()).append("sname",player._2()).append("cid",chamID).append("cname",chamName).append("pos",posAttri.getPos()).append("metric",posAttri.getMetric());
+                        documents.add(documentPos);
                     }
 
                 }
 
             }
 
+            /*
             MongoDBUtil.getDatabase_LOL()
                     .getCollection("baseTOP_graph").insertMany(documentsTOP);
             System.out.println("TOP写入Mongodb完成");
@@ -109,6 +100,10 @@ public class WriterInMongo {
             MongoDBUtil.getDatabase_LOL()
                     .getCollection("baseSUP_graph").insertMany(documentsSUP);
             System.out.println("SUP写入Mongodb完成");
+            */
+            MongoDBUtil.getDatabase_LOL()
+                    .getCollection("base_graph").insertMany(documents);
+            System.out.println("写入Mongodb完成");
 
 
         }catch (Throwable t){
