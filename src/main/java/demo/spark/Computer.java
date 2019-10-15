@@ -17,14 +17,13 @@ public class Computer {
         HashMap<Tuple2<String,String>,List<ChampionAttri>> chamMap = new HashMap<>(2800);
         Iterator iterator = summonerMap.entrySet().iterator();
         HashMap<Tuple2<String,String>, Long> chamIDMap = new HashMap<>();
-
+        long chamID  = 0;
         while (iterator.hasNext()){
             HashMap.Entry entry = (HashMap.Entry) iterator.next();
             Tuple2<String,String> player = (Tuple2<String,String>)entry.getKey();
             List<Game> games = (List<Game>)entry.getValue();
             HashMap<String, HashMap<String,List<Double>>> championMap = new HashMap<>();
             if(games!= null) {
-                long chamID  = 0;
                 for (Game game : games) {
                     Tuple2<String, String> chamTul = new Tuple2<>(game.getChampion_name(),game.getPos());
                     if(!chamIDMap.containsKey(chamTul)){
