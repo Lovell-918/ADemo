@@ -26,9 +26,9 @@ public class Computer {
             if(games!= null) {
                 long chamID  = 0;
                 for (Game game : games) {
-                    if(!chamIDMap.containsKey(game.getChampion_name())){
+                    if(!chamIDMap.containsKey(game.getChampion_name()+game.getPos())){
                         chamID++;
-                        chamIDMap.put(game.getChampion_name(),chamID);
+                        chamIDMap.put(game.getChampion_name()+game.getPos(),chamID);
                     }
                     if(!championMap.containsKey(game.getChampion_name())){
                         HashMap<String,List<Double>> tempHm = new HashMap<>();
