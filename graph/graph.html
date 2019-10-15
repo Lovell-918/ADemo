@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Graph</title>
+    <div id='aee511ba4-5dbc-4ce0-b157-e4fcb53336c8' style='width:960px; height:500px'></div>
+    <style>
+        .node circle {
+            fill: gray;
+        }
+
+        .node text {
+            font: 10px sans-serif;
+            text-anchor: middle;
+            fill: white;
+        }
+
+        line.link {
+            stroke: gray;
+            stroke-width: 1.5px;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+</head>
+<body>
+<script>
+    var width = 2000, height = 1500;
+    var svg = d3.select("#aee511ba4-5dbc-4ce0-b157-e4fcb53336c8").append("svg")
+        .attr("width", width).attr("height", height);
+    var nodes = [{id: 1215275, name: "TwitchTV리리스"}, {id: 1222470, name: "고양이털 수집가"}, {
+        id: 1543626,
+        name: "적당히 좀 던져라"
+    }, {id: 1931116, name: "minimaxi"}, {id: 2010218, name: "냥냥이델꼬가"}, {id: 2031907, name: "Athena1"}, {
+        id: 2066159,
+        name: "오빠의바나나"
+    }, {id: 2395962, name: "Naehyun"}, {id: 2435079, name: "당겨온다"}, {id: 3355774, name: "호잇Ol"}, {
+        id: 3416727,
+        name: "세이미ToT"
+    }, {id: 3437729, name: "주노야놀자"}, {id: 4977344, name: "장고끝에악수둔다"}, {id: 5327517, name: "Jg BOT1"}, {
+        id: 5602930,
+        name: "근히키"
+    }, {id: 6300872, name: "No longer love"}, {id: 7470346, name: "곽123"}, {
+        id: 8201453,
+        name: "flawless1234"
+    }, {id: 8973164, name: "교만하지않는다"}, {id: 9337635, name: "한승호입니다"}, {id: 9810634, name: "NekoL"}, {
+        id: 10350752,
+        name: "김치는찢어야제맛"
+    }, {id: 11180846, name: "햄스터 교수"}, {id: 11981730, name: "엑시드 하니"}, {
+        id: 13762462,
+        name: "SANDBOX Dove"
+    }, {id: 13965344, name: "SANDBOX Ghost"}, {id: 15270125, name: "영 벨"}, {id: 17594093, name: "억울억울"}, {
+        id: 17886101,
+        name: "ArcheSia"
+    }, {id: 21251051, name: "donyeok2"}, {id: 21961814, name: "Shudderx"}, {
+        id: 22210594,
+        name: "웃는게웃는게아냐"
+    }, {id: 22231139, name: "DWG Punch"}, {id: 23882897, name: "모행근"}, {id: 24082536, name: "필요한채팅만침"}, {
+        id: 24953043,
+        name: "Winter 0"
+    }, {id: 27020286, name: "Second Page"}, {id: 28520919, name: "이리와봐요귀요미"}, {
+        id: 30010179,
+        name: "KT 비디디"
+    }, {id: 31361756, name: "별사탕이좋아요"}, {id: 38121699, name: "POGGERS"}, {
+        id: 38371270,
+        name: "Gen G Asper"
+    }, {id: 39221139, name: "이민욱 Fans"}, {id: 41913808, name: "DWG ShowMaker"}, {
+        id: 43901387,
+        name: "펭귄이 울면"
+    }, {id: 45300547, name: "하이드"}, {id: 45650941, name: "미야고 fan"}, {id: 46840133, name: "GlmGoon"}, {
+        id: 48450255,
+        name: "오른정글만함"
+    }, {id: 50810555, name: "50810555del"}, {id: 53191248, name: "Kloen"}, {id: 54692988, name: "룔드컵"}, {
+        id: 55020356,
+        name: "Kim Sang Hoon"
+    }, {id: 56951349, name: "NFT Newt"}, {id: 59870571, name: "NDTC"}, {
+        id: 60491041,
+        name: "SKT T1 김희창"
+    }, {id: 65810315, name: "akde"}, {id: 65941407, name: "영주제일고이시우"}, {id: 67770716, name: "베어 쓰러뜨리다"}, {
+        id: 69170643,
+        name: "FATE"
+    }, {id: 69510686, name: "MapSSi"}, {id: 69810583, name: "더 가취 있기를"}, {id: 73551064, name: "욕받이서포터1"}, {
+        id: 73620819,
+        name: "누나 나를 사랑해"
+    }, {id: 74850869, name: "sdki271154s"}, {id: 76810238, name: "fat guy"}, {
+        id: 77010514,
+        name: "iboy2"
+    }, {id: 77520835, name: "월드스타혜지"}, {id: 78780449, name: "Just Chillax"}, {
+        id: 80851510,
+        name: "비선별인원구기창"
+    }, {id: 81140613, name: "333눔"}, {id: 81220617, name: "ccccco"}, {id: 81280974, name: "sadoikqdw"}, {
+        id: 81290702,
+        name: "극복할꺼야"
+    }, {id: 81390618, name: "asdmklasdfmkl"}, {id: 82539100, name: "blingb1ing"}, {
+        id: 82558426,
+        name: "War13"
+    }, {id: 82654307, name: "Tuesunporc"}, {id: 82717240, name: "X1LANX1LANX1LAN"}, {
+        id: 82883938,
+        name: "qrtyop123"
+    }, {id: 82989738, name: "평강과온달"}, {id: 83093626, name: "Cyu"}, {id: 83111669, name: "핑3번찍으면OPEN"}, {
+        id: 83121373,
+        name: "Recall9"
+    }, {id: 83127604, name: "SKT T1 Radiant"}, {id: 83191872, name: "mi zhang"}, {
+        id: 83351434,
+        name: "TW Da Che Dui"
+    }, {id: 83354189, name: "zeoh"}, {id: 83493415, name: "마지막river"}, {id: 83506456, name: "페르장미"}, {
+        id: 83530781,
+        name: "줄곧 사랑"
+    }, {id: 83539023, name: "Huya 17632200"}, {id: 83722368, name: "tinowns2"}, {
+        id: 85,
+        name: "圣枪游侠",
+        pos: "下路"
+    }, {id: 71, name: "深海泰坦", pos: "辅助"}, {id: 181, name: "血港鬼影", pos: "中单"}, {
+        id: 29,
+        name: "光辉女郎",
+        pos: "辅助"
+    }, {id: 228, name: "时光守护者", pos: "辅助"}, {id: 222, name: "诡术妖姬", pos: "上单"}, {
+        id: 453,
+        name: "巨魔之王",
+        pos: "辅助"
+    }, {id: 42, name: "死亡颂唱者", pos: "中单"}, {id: 132, name: "瓦洛兰之盾", pos: "辅助"}, {
+        id: 30,
+        name: "唤潮鲛姬",
+        pos: "辅助"
+    }, {id: 255, name: "虚空之眼", pos: "辅助"}, {id: 116, name: "虚空之女", pos: "上单"}, {
+        id: 98,
+        name: "麦林炮手",
+        pos: "下路"
+    }, {id: 221, name: "元素女皇", pos: "打野"}, {id: 95, name: "寒冰射手", pos: "下路"}, {
+        id: 66,
+        name: "魂锁典狱长",
+        pos: "辅助"
+    }, {id: 468, name: "蒸汽机器人", pos: "中单"}, {id: 4, name: "时间刺客", pos: "打野"}, {
+        id: 96,
+        name: "战争女神",
+        pos: "下路"
+    }, {id: 20, name: "天启者", pos: "上单"}, {id: 286, name: "猩红收割者", pos: "下路"}, {
+        id: 37,
+        name: "虚空遁地兽",
+        pos: "打野"
+    }, {id: 37, name: "虚空遁地兽", pos: "打野"}, {id: 224, name: "元素女皇", pos: "上单"}, {
+        id: 244,
+        name: "解脱者",
+        pos: "下路"
+    }, {id: 204, name: "血港鬼影", pos: "上单"}, {id: 164, name: "放逐之刃", pos: "中单"}, {
+        id: 19,
+        name: "正义巨像",
+        pos: "上单"
+    }, {id: 18, name: "暗裔剑魔", pos: "上单"}, {id: 15, name: "魔法猫咪", pos: "辅助"}, {
+        id: 151,
+        name: "影流之主",
+        pos: "上单"
+    }, {id: 74, name: "狂战士", pos: "中单"}, {id: 66, name: "魂锁典狱长", pos: "辅助"}, {
+        id: 196,
+        name: "战争之影",
+        pos: "上单"
+    }, {id: 280, name: "远古巫灵", pos: "辅助"}, {id: 65, name: "解脱者", pos: "中单"}, {
+        id: 15,
+        name: "魔法猫咪",
+        pos: "辅助"
+    }, {id: 452, name: "正义巨像", pos: "下路"}, {id: 180, name: "发条魔灵", pos: "上单"}, {
+        id: 56,
+        name: "盲僧",
+        pos: "打野"
+    }, {id: 440, name: "堕落天使", pos: "上单"}, {id: 53, name: "光辉女郎", pos: "下路"}, {
+        id: 158,
+        name: "暗裔剑魔",
+        pos: "中单"
+    }, {id: 124, name: "发条魔灵", pos: "中单"}, {id: 353, name: "魔法猫咪", pos: "中单"}, {
+        id: 78,
+        name: "幻翎",
+        pos: "辅助"
+    }, {id: 414, name: "虚空行者", pos: "辅助"}, {id: 197, name: "探险家", pos: "中单"}, {
+        id: 15,
+        name: "魔法猫咪",
+        pos: "辅助"
+    }, {id: 285, name: "祖安狂人", pos: "下路"}, {id: 99, name: "戏命师", pos: "下路"}, {
+        id: 138,
+        name: "离群之刺",
+        pos: "上单"
+    }, {id: 21, name: "曙光女神", pos: "辅助"}, {id: 130, name: "岩雀", pos: "中单"}, {
+        id: 72,
+        name: "猩红收割者",
+        pos: "上单"
+    }, {id: 242, name: "战争之影", pos: "中单"}, {id: 15, name: "魔法猫咪", pos: "辅助"}, {
+        id: 82,
+        name: "暴走萝莉",
+        pos: "下路"
+    }, {id: 197, name: "探险家", pos: "中单"}, {id: 264, name: "暗黑元首", pos: "下路"}, {
+        id: 243,
+        name: "魂锁典狱长",
+        pos: "中单"
+    }, {id: 287, name: "诺克萨斯统领", pos: "上单"}, {id: 296, name: "河流之王", pos: "下路"}, {
+        id: 184,
+        name: "虚空恐惧",
+        pos: "中单"
+    }, {id: 110, name: "影流之主", pos: "中单"}, {id: 99, name: "戏命师", pos: "下路"}, {
+        id: 101,
+        name: "牛头酋长",
+        pos: "辅助"
+    }, {id: 106, name: "正义巨像", pos: "辅助"}, {id: 41, name: "众星之子", pos: "辅助"}, {
+        id: 15,
+        name: "魔法猫咪",
+        pos: "辅助"
+    }, {id: 78, name: "幻翎", pos: "辅助"}, {id: 29, name: "光辉女郎", pos: "辅助"}, {id: 129, name: "暗裔剑魔", pos: "下路"}, {
+        id: 192,
+        name: "万花通灵",
+        pos: "上单"
+    }, {id: 66, name: "魂锁典狱长", pos: "辅助"}, {id: 328, name: "魂锁典狱长", pos: "打野"}, {
+        id: 16,
+        name: "酒桶",
+        pos: "打野"
+    }, {id: 152, name: "诡术妖姬", pos: "中单"}, {id: 70, name: "血港鬼影", pos: "辅助"}, {
+        id: 569,
+        name: "不祥之刃",
+        pos: "辅助"
+    }, {id: 172, name: "无双剑姬", pos: "中单"}, {id: 36, name: "刀锋之影", pos: "中单"}, {
+        id: 150,
+        name: "疾风剑豪",
+        pos: "下路"
+    }, {id: 45, name: "光辉女郎", pos: "中单"}, {id: 124, name: "发条魔灵", pos: "中单"}, {
+        id: 152,
+        name: "诡术妖姬",
+        pos: "中单"
+    }, {id: 222, name: "诡术妖姬", pos: "上单"}, {id: 100, name: "末日使者", pos: "辅助"}, {
+        id: 24,
+        name: "法外狂徒",
+        pos: "打野"
+    }, {id: 8, name: "天启者", pos: "中单"}, {id: 59, name: "岩雀", pos: "下路"}, {id: 16, name: "酒桶", pos: "打野"}, {
+        id: 224,
+        name: "元素女皇",
+        pos: "上单"
+    }];
+    var links = [{source: nodes[0], target: nodes[93]}, {source: nodes[1], target: nodes[94]}, {
+        source: nodes[2],
+        target: nodes[95]
+    }, {source: nodes[3], target: nodes[96]}, {source: nodes[4], target: nodes[97]}, {
+        source: nodes[5],
+        target: nodes[98]
+    }, {source: nodes[6], target: nodes[99]}, {source: nodes[7], target: nodes[100]}, {
+        source: nodes[8],
+        target: nodes[101]
+    }, {source: nodes[9], target: nodes[102]}, {source: nodes[10], target: nodes[103]}, {
+        source: nodes[11],
+        target: nodes[104]
+    }, {source: nodes[12], target: nodes[105]}, {source: nodes[13], target: nodes[106]}, {
+        source: nodes[14],
+        target: nodes[107]
+    }, {source: nodes[15], target: nodes[108]}, {source: nodes[16], target: nodes[109]}, {
+        source: nodes[17],
+        target: nodes[110]
+    }, {source: nodes[18], target: nodes[111]}, {source: nodes[19], target: nodes[112]}, {
+        source: nodes[20],
+        target: nodes[113]
+    }, {source: nodes[21], target: nodes[114]}, {source: nodes[22], target: nodes[114]}, {
+        source: nodes[23],
+        target: nodes[116]
+    }, {source: nodes[24], target: nodes[117]}, {source: nodes[25], target: nodes[118]}, {
+        source: nodes[26],
+        target: nodes[119]
+    }, {source: nodes[27], target: nodes[120]}, {source: nodes[28], target: nodes[121]}, {
+        source: nodes[29],
+        target: nodes[122]
+    }, {source: nodes[30], target: nodes[123]}, {source: nodes[31], target: nodes[124]}, {
+        source: nodes[32],
+        target: nodes[108]
+    }, {source: nodes[33], target: nodes[126]}, {source: nodes[34], target: nodes[127]}, {
+        source: nodes[35],
+        target: nodes[128]
+    }, {source: nodes[36], target: nodes[122]}, {source: nodes[37], target: nodes[130]}, {
+        source: nodes[38],
+        target: nodes[131]
+    }, {source: nodes[39], target: nodes[132]}, {source: nodes[40], target: nodes[133]}, {
+        source: nodes[41],
+        target: nodes[134]
+    }, {source: nodes[42], target: nodes[135]}, {source: nodes[43], target: nodes[136]}, {
+        source: nodes[44],
+        target: nodes[137]
+    }, {source: nodes[45], target: nodes[138]}, {source: nodes[46], target: nodes[139]}, {
+        source: nodes[47],
+        target: nodes[140]
+    }, {source: nodes[48], target: nodes[122]}, {source: nodes[49], target: nodes[142]}, {
+        source: nodes[50],
+        target: nodes[143]
+    }, {source: nodes[51], target: nodes[144]}, {source: nodes[52], target: nodes[145]}, {
+        source: nodes[53],
+        target: nodes[146]
+    }, {source: nodes[54], target: nodes[147]}, {source: nodes[55], target: nodes[148]}, {
+        source: nodes[56],
+        target: nodes[122]
+    }, {source: nodes[57], target: nodes[150]}, {source: nodes[58], target: nodes[140]}, {
+        source: nodes[59],
+        target: nodes[152]
+    }, {source: nodes[60], target: nodes[153]}, {source: nodes[61], target: nodes[154]}, {
+        source: nodes[62],
+        target: nodes[155]
+    }, {source: nodes[63], target: nodes[156]}, {source: nodes[64], target: nodes[157]}, {
+        source: nodes[65],
+        target: nodes[143]
+    }, {source: nodes[66], target: nodes[159]}, {source: nodes[67], target: nodes[160]}, {
+        source: nodes[68],
+        target: nodes[161]
+    }, {source: nodes[69], target: nodes[122]}, {source: nodes[70], target: nodes[138]}, {
+        source: nodes[71],
+        target: nodes[96]
+    }, {source: nodes[72], target: nodes[165]}, {source: nodes[73], target: nodes[166]}, {
+        source: nodes[74],
+        target: nodes[108]
+    }, {source: nodes[75], target: nodes[168]}, {source: nodes[76], target: nodes[169]}, {
+        source: nodes[77],
+        target: nodes[170]
+    }, {source: nodes[78], target: nodes[171]}, {source: nodes[79], target: nodes[172]}, {
+        source: nodes[80],
+        target: nodes[173]
+    }, {source: nodes[81], target: nodes[174]}, {source: nodes[82], target: nodes[175]}, {
+        source: nodes[83],
+        target: nodes[176]
+    }, {source: nodes[84], target: nodes[136]}, {source: nodes[85], target: nodes[170]}, {
+        source: nodes[86],
+        target: nodes[98]
+    }, {source: nodes[87], target: nodes[180]}, {source: nodes[88], target: nodes[181]}, {
+        source: nodes[89],
+        target: nodes[182]
+    }, {source: nodes[90], target: nodes[183]}, {source: nodes[91], target: nodes[169]}, {
+        source: nodes[92],
+        target: nodes[116]
+    }];
+    var link = svg.selectAll(".link").data(links);
+    link.enter().insert("line", ".node").attr("class", "link");
+    var node = svg.selectAll(".node").data(nodes);
+    var nodeEnter = node.enter().append("g").attr("class", "node");
+    nodeEnter.append("circle").attr("r", 20);
+    nodeEnter.append("text").attr("font", function (b) {
+        return 25 / b.name.length + "px"
+    })
+        .text(function (d) {
+            return d.name + (d.hasOwnProperty("pos") ? " " + d['pos'] : "");
+        });
+    d3.layout.force().linkDistance(50).charge(-200).chargeDistance(300)
+        .friction(0.95).linkStrength(0.5).size([width, height])
+        .on("tick", function () {
+            link.attr("x1", function (d) {
+                return d.source.x;
+            })
+                .attr("y1", function (d) {
+                    return d.source.y;
+                })
+                .attr("x2", function (d) {
+                    return d.target.x;
+                })
+                .attr("y2", function (d) {
+                    return d.target.y;
+                });
+            node.attr("transform", function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+        }).nodes(nodes).links(links).start();
+</script>
+</body>
+</html>
+ 
