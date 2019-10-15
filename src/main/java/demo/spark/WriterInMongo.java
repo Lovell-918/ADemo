@@ -74,9 +74,9 @@ public class WriterInMongo {
                 for(ChampionAttri championAttri:championAttriList){
                     String chamName = championAttri.getChampion_name();
                     List<PosAttri> posAttriList = championAttri.getPosAttriList();
-                    Long chamID = championAttri.getChampionID();
                     for(PosAttri posAttri:posAttriList){
-                        Document documentPos = new Document("sid",player._1()).append("sname",player._2()).append("cid",chamID).append("cname",chamName).append("pos",posAttri.getPos()).append("metric",posAttri.getMetric());
+                        Long chamID = posAttri.getChamPoID();
+                        Document documentPos = new Document("sid",player._1()).append("sname",player._2()).append("c_pid",chamID).append("cname",chamName).append("pos",posAttri.getPos()).append("metric",posAttri.getMetric());
                         documents.add(documentPos);
                     }
 
