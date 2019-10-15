@@ -47,7 +47,7 @@ public class WriterInMongo {
 
             */
 
-            MongoDBUtil.creatCollection("base_graph");
+            MongoDBUtil.getDatabase_LOL().getCollection("base_graph").drop();
             List<Document> documents = new ArrayList<>();
 
             Iterator it = chamMap.entrySet().iterator();

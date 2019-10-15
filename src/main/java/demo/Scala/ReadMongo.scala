@@ -5,7 +5,6 @@ import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.graphstream.graph.implementations.{AbstractEdge, SingleGraph, SingleNode}
-import org.graphstream.graph.{Graph => GraphStream}
 
 object ReadMongo extends Serializable {
   def main(args: Array[String]): Unit = {
@@ -23,13 +22,13 @@ object ReadMongo extends Serializable {
 
     class VertexProperty()
     case class UserProperty(sname: String) extends VertexProperty
-    case class ChampionProperty(cname: String,pos: String) extends VertexProperty
+    case class ChampionProperty(cname: String, pos: String) extends VertexProperty
     val uvrdd: RDD[(VertexId, VertexProperty)] = nameRdd.map(
       it => (it.get("sid").toString.trim.toLong, UserProperty(it.get("sname").toString)
       )
     )
     val cvrdd: RDD[(VertexId, VertexProperty)] = nameRdd.map(
-      it => (it.get("cid").toString.trim.toLong, ChampionProperty(it.get("cname").toString, it.get("pos").toString))
+      it => (it.get("c_pid").toString.trim.toLong, ChampionProperty(it.get("cname").toString, it.get("pos").toString))
     )
 
     val vrdd: RDD[(VertexId, VertexProperty)] = uvrdd.++(cvrdd)
@@ -40,41 +39,37 @@ object ReadMongo extends Serializable {
     //    啊这一段是之前在胡乱尝试的
     //    case class UserName ()
     val erdd: RDD[Edge[Double]] = nameRdd.map(
-      it => Edge(it.get("sid").toString.trim.toLong, it.get("cid").toString.trim.toLong, it.get("metric").toString.trim.toDouble)
+      it => Edge(it.get("sid").toString.trim.toLong, it.get("c_pid").toString.trim.toLong, it.get("metric").toString.trim.toDouble)
     )
 
     graph = Graph(vrdd, erdd)
 
-    graph.vertices.map(
-      v => v._2.getClass match {
-        case UserProperty.getClass => v._2.asInstanceOf[UserProperty].sname
-      }
-    )
-
     graph.cache()
 
 
-    val visualization : SingleGraph = new SingleGraph("demo")
-    visualization.addAttribute("ui.stylesheet","url(./style/demoStyle.css)")
+    val visualization: SingleGraph = new SingleGraph("demo")
+    visualization.addAttribute("ui.stylesheet", "url(./style/demoStyle.css)")
     visualization.addAttribute("ui.quality")
     visualization.addAttribute("ui.antialias")
 
-    for ((id,uprop) <- graph.vertices.filter{case (id,prop) => prop.isInstanceOf[UserProperty]}.collect()){
-      val unode = visualization.addNode(uprop.asInstanceOf[UserProperty].sname).asInstanceOf[SingleNode]
+    for ((id, uprop) <- graph.vertices.filter { case (id, prop) => prop.isInstanceOf[UserProperty] }.collect()) {
+      val unode = visualization.addNode(id.toString).asInstanceOf[SingleNode]
+      unode.addAttribute("ui.label", uprop.asInstanceOf[UserProperty].sname)
     }
 
-    for ((id,uprop) <- graph.vertices.filter{case (id,prop) => prop.isInstanceOf[ChampionProperty] && prop.asInstanceOf[ChampionProperty].pos.equals("辅助")}.collect()){
-      val cnode = visualization.addNode(uprop.asInstanceOf[ChampionProperty].cname).asInstanceOf[SingleNode]
+    for ((id, uprop) <- graph.vertices.filter { case (id, prop) => prop.isInstanceOf[ChampionProperty] && prop.asInstanceOf[ChampionProperty].pos.equals("辅助") }.collect()) {
+      val cnode = visualization.addNode(id.toString).asInstanceOf[SingleNode]
+      cnode.addAttribute("ui.label", uprop.asInstanceOf[ChampionProperty].pos + " " + uprop.asInstanceOf[ChampionProperty].cname)
     }
 
     for (e <- graph.triplets.collect()) {
-      val edge = visualization.addEdge((e.srcId+e.dstId).toString,e.srcAttr.asInstanceOf[UserProperty].sname,e.dstAttr.asInstanceOf[ChampionProperty].cname,true).asInstanceOf[AbstractEdge]
+      val edge = visualization.addEdge((e.srcId + e.dstId).toString, e.srcId.toString, e.dstId.toString, true).asInstanceOf[AbstractEdge]
     }
 
     visualization.display()
-//    graph.triplets.map(
-//      triplet => triplet.srcAttr.asInstanceOf[UserProperty].sname + " " + triplet.attr + " " + triplet.dstAttr.asInstanceOf[ChampionProperty].cname
-//    ).collect().foreach(println(_))
+    //    graph.triplets.map(
+    //      triplet => triplet.srcAttr.asInstanceOf[UserProperty].sname + " " + triplet.attr + " " + triplet.dstAttr.asInstanceOf[ChampionProperty].cname
+    //    ).collect().foreach(println(_))
     spark.stop()
   }
 }
