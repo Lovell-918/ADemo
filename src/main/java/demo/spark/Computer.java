@@ -16,18 +16,16 @@ public class Computer {
         HashMap<Tuple2<String,String>, List<Game>> summonerMap = readerFromMongo.receive();
         HashMap<Tuple2<String,String>,List<ChampionAttri>> chamMap = new HashMap<>(2800);
         Iterator iterator = summonerMap.entrySet().iterator();
-        HashMap<String, Long> chamIDMap = new HashMap<>();
-
+        HashMap<Tuple2<String,String>, Long> chamIDMap = new HashMap<>();
+        long chamID  = 0;
         while (iterator.hasNext()){
             HashMap.Entry entry = (HashMap.Entry) iterator.next();
             Tuple2<String,String> player = (Tuple2<String,String>)entry.getKey();
             List<Game> games = (List<Game>)entry.getValue();
             HashMap<String, HashMap<String,List<Double>>> championMap = new HashMap<>();
             if(games!= null) {
-                long chamID  = 0;
                 for (Game game : games) {
-//                    Tuple2<String, String> chamTul = new Tuple2<>(game.getChampion_name(),game.getPos());
-                    String chamTul = game.getChampion_name()+game.getPos();
+                    Tuple2<String, String> chamTul = new Tuple2<>(game.getChampion_name(),game.getPos());
                     if(!chamIDMap.containsKey(chamTul)){
                         chamID++;
                         chamIDMap.put(chamTul,chamID);
@@ -68,7 +66,7 @@ public class Computer {
                         List<Double> metricList = (List<Double>)pEntry.getValue();
                         double metric = metricList.stream().mapToDouble(Double::byteValue).summaryStatistics().getSum();
                         metric = metric / Math.pow(metricList.size(),0.97);
-                        posAttris.add(new PosAttri(posString,metric,chamIDMap.get(championName+posString)));
+                        posAttris.add(new PosAttri(posString,metric,chamIDMap.get(new Tuple2<>(championName,posString))));
                     }
                    championAttriList.add(new ChampionAttri(championName,posAttris));
                 }
