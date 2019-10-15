@@ -3,7 +3,7 @@ package demo.Scala
 import java.io.{File, PrintWriter}
 
 import com.mongodb.spark.MongoSpark
-import org.apache.spark.graphx.{Edge, Graph, VertexId, VertexRDD}
+import org.apache.spark.graphx.{Edge, Graph, VertexId}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -40,45 +40,49 @@ object ReadMongo extends Serializable {
 
     graph = Graph(vrdd, erdd)
 
-    var g = graph.subgraph(epred = tri => tri.dstAttr.asInstanceOf[ChampionProperty].cname.equals("酒桶")&&tri.dstAttr.asInstanceOf[ChampionProperty].pos.equals("辅助"))
+    for (v <- graph.vertices.filter(pred = x => x._2.isInstanceOf[ChampionProperty]).collect()) {
+      val p = v._2.asInstanceOf[ChampionProperty]
+      var g = graph.subgraph(epred = tri => tri.dstAttr.asInstanceOf[ChampionProperty].cname.equals(p.cname) && tri.dstAttr.asInstanceOf[ChampionProperty].pos.equals(p.pos))
 
-    g.cache()
 
-    g = g.outerJoinVertices(g.degrees){
-      case (_,prop,Some(x)) => (prop,x)
-      case (_,prop,_) => (prop,0)
-    }.subgraph(vpred = {case (_,(_,x)) => x>0}).mapVertices{case (_,(prop,_)) => prop}
+      g = g.outerJoinVertices(g.degrees) {
+        case (_, prop, Some(x)) => (prop, x)
+        case (_, prop, _) => (prop, 0)
+      }.subgraph(vpred = {
+        case (_, (_, x)) => x > 0
+      }).mapVertices { case (_, (prop, _)) => prop }
 
-    val u = java.util.UUID.randomUUID
-//    val sv = g.triplets.collect.map(tri => (tri.srcId,tri.srcAttr.asInstanceOf[UserProperty].sname))
-//    val sv = g.vertices.filter(pred = v => v._2.isInstanceOf[UserProperty]).map(v => (v._1,v._2.asInstanceOf[UserProperty].sname)).collect
-//    val dv = g.triplets.collect.map(tri => (tri.dstId,tri.dstAttr.asInstanceOf[ChampionProperty].cname,tri.dstAttr.asInstanceOf[ChampionProperty].pos))
-//    val dv = g.vertices.filter(pred = v => v._2.isInstanceOf[ChampionProperty]).map{
-//      v =>
-//        val prop = v._2.asInstanceOf[ChampionProperty]
-//        (v._1,prop.cname,prop.pos)
-//    }.collect
-//
-//    sv.foreach(println(_))
-//    dv.foreach(println(_))
+      val u = java.util.UUID.randomUUID
+      //    val sv = g.triplets.collect.map(tri => (tri.srcId,tri.srcAttr.asInstanceOf[UserProperty].sname))
+      //    val sv = g.vertices.filter(pred = v => v._2.isInstanceOf[UserProperty]).map(v => (v._1,v._2.asInstanceOf[UserProperty].sname)).collect
+      //    val dv = g.triplets.collect.map(tri => (tri.dstId,tri.dstAttr.asInstanceOf[ChampionProperty].cname,tri.dstAttr.asInstanceOf[ChampionProperty].pos))
+      //    val dv = g.vertices.filter(pred = v => v._2.isInstanceOf[ChampionProperty]).map{
+      //      v =>
+      //        val prop = v._2.asInstanceOf[ChampionProperty]
+      //        (v._1,prop.cname,prop.pos)
+      //    }.collect
+      //
+      //    sv.foreach(println(_))
+      //    dv.foreach(println(_))
 
-    var sorted = g.triplets.sortBy(tri => tri.attr,ascending = false).collect()
-    sorted = sorted.dropRight(sorted.length - 30)
-    val gg = sc.parallelize(sorted)
+      var sorted = g.triplets.sortBy(tri => tri.attr, ascending = false).collect()
+      sorted = sorted.dropRight(sorted.length - 20)
+      val gg = sc.parallelize(sorted)
 
-    val sv = gg.filter(v => v.srcAttr.isInstanceOf[UserProperty]).map(v => (v.srcId,v.srcAttr.asInstanceOf[UserProperty].sname)).collect
-    //    val dv = g.triplets.collect.map(tri => (tri.dstId,tri.dstAttr.asInstanceOf[ChampionProperty].cname,tri.dstAttr.asInstanceOf[ChampionProperty].pos))
-    val dv = gg.filter(v => v.dstAttr.isInstanceOf[ChampionProperty]).map{
-      v =>
-        val prop = v.dstAttr.asInstanceOf[ChampionProperty]
-        (v.dstId,prop.cname,prop.pos)
-    }.collect()
+      val sv = gg.filter(v => v.srcAttr.isInstanceOf[UserProperty]).map(v => (v.srcId, v.srcAttr.asInstanceOf[UserProperty].sname)).collect
+      //    val dv = g.triplets.collect.map(tri => (tri.dstId,tri.dstAttr.asInstanceOf[ChampionProperty].cname,tri.dstAttr.asInstanceOf[ChampionProperty].pos))
+      var dv = gg.filter(v => v.dstAttr.isInstanceOf[ChampionProperty]).map {
+        v =>
+          val prop = v.dstAttr.asInstanceOf[ChampionProperty]
+          (v.dstId, prop.cname, prop.pos)
+      }.collect()
+      dv = dv.drop(dv.length - 1)
 
-    sv.foreach(println(_))
-    dv.foreach(println(_))
+      sv.foreach(println(_))
+      dv.foreach(println(_))
 
-    val html =
-      """<!DOCTYPE html>
+      val html =
+        """<!DOCTYPE html>
                   <html lang="en">
                         <head>
                         <meta charset="utf-8">
@@ -96,7 +100,8 @@ object ReadMongo extends Serializable {
                   <script src="https://d3js.org/d3.v3.min.js"></script>
                   </head>
                   <body>
-                  <div id='a""" + u +"""'></div>
+                  <div id='a""" + u +
+          """'></div>
           <script>
                                         $.ajaxSettings.async = false;
                $.getJSON("hero.json",function (hero) {
@@ -110,21 +115,21 @@ object ReadMongo extends Serializable {
                  height = $(window).height();
            }
            var svg = d3.select("#a""" + u +
-                  """").append("svg")
+          """").append("svg")
           .attr("width", width).attr("height", height);
-          var nodes = [""" + sv.map(t2 => "{id:" + t2._1 + ", name:\""+t2._2+"\",type:\"s\"}").mkString(",") +
-                  """,""" + dv.map(t3 => "{id:" + t3._1 + ",name:\""+t3._2+"\",pos:\""+t3._3+"\",type:\"c\"}").mkString(",") +
-                  """];
+          var nodes = [""" + sv.map(t2 => "{id:" + t2._1 + ", name:\"" + t2._2 + "\",type:\"s\"}").mkString(",") +
+          """,""" + dv.map(t3 => "{id:" + t3._1 + ",name:\"" + t3._2 + "\",pos:\"" + t3._3 + "\",type:\"c\"}").mkString(",") +
+          """];
           var links = [""" + gg.map(
-                  e => "{source:nodes[" + sv.indexWhere(_._1 == e.srcId) +
-                    "],target:nodes[" +
-                    (dv.indexWhere(_._1 == e.dstId) + sv.length) + "],metric:"+e.attr.toString+",id:"+e.srcId.toString+e.dstId.toString+"}").collect().mkString(",") +
-                  """];
+          e => "{source:nodes[" + sv.indexWhere(_._1 == e.srcId) +
+            "],target:nodes[" +
+            (dv.indexWhere(_._1 == e.dstId) + sv.length) + "],metric:" + e.attr.toString + ",id:" + e.srcId.toString + e.dstId.toString + "}").collect().mkString(",") +
+          """];
           var link = svg.selectAll(".link").data(links);
           link.enter().insert("line", ".node").attr("class","link");
           var node = svg.selectAll(".node").data(nodes);
           var nodeEnter = node.enter().append("g").attr("class", "node");
-          nodeEnter.append("circle").attr("r", 7);
+          nodeEnter.append("circle").attr("r", 10);
           nodeEnter.append("image")
                .attr("xlink:href", function(d, i) {
                    if (d['type'] === "c") {
@@ -141,7 +146,15 @@ object ReadMongo extends Serializable {
                .attr("y", -16)
                .attr("width", 32)
                .attr("height", 32);
-          nodeEnter.append("text").attr("dy", function(d, i) {
+          nodeEnter.append("a").attr("href",function(d){if (d['type'] === "c") {
+                    for (var h in hs){
+                             if (hs[h]['name'] === d['name']){
+                                 return "https://www.op.gg/champion/"+hs[h]['alias'];
+                             }
+                         }
+                } else {
+                    return "https://www.op.gg/summoner/userName=" + d['name'];
+                }}).append("text").attr("dy", function(d, i) {
                if (d['type'] === "c") {
                    return "24px";
                } else {
@@ -149,7 +162,7 @@ object ReadMongo extends Serializable {
                }
            })
             .text(function(d) { return d.name + (d['type'] === 'c' ? "@" + d['pos']:""); });
-          d3.layout.force().linkDistance(35).charge(-150).chargeDistance(130)
+          d3.layout.force().linkDistance(35).charge(-250).chargeDistance(180)
            .friction(0.95).linkStrength(0.5).size([width, height])
           .on("tick", function() {
           link.attr("x1", function(d) { return d.source.x; })
@@ -165,36 +178,41 @@ object ReadMongo extends Serializable {
           </html>
  """
 
-    val writer = new PrintWriter(new File(".\\graph\\graph.html"))
-    writer.print(html)
-    writer.close()
+      val file = new File(".\\graph\\graph_" + p.cname + "_" + p.pos + ".html")
+      if (!file.exists()) {
+        file.createNewFile()
+      }
+      val writer = new PrintWriter(file)
+      writer.print(html)
+      writer.close()
 
-    //    val visualization: SingleGraph = new SingleGraph("demo")
-    //    visualization.addAttribute("ui.stylesheet", "url(./style/demoStyle.css)")
-    //    visualization.addAttribute("ui.quality")
-    //    visualization.addAttribute("ui.antialias")
-    //
-    //    for ((id, uprop) <- graph.vertices.filter { case (id, prop) => prop.isInstanceOf[UserProperty] }.collect()) {
-    //      val unode = visualization.addNode(id.toString).asInstanceOf[SingleNode]
-    //      unode.addAttribute("ui.label", uprop.asInstanceOf[UserProperty].sname)
-    //    }
-    //
-    //    for ((id, uprop) <- graph.vertices.filter { case (id, prop) => prop.isInstanceOf[ChampionProperty] }.collect()) {
-    //      val cnode = visualization.addNode(id.toString).asInstanceOf[SingleNode]
-    //      cnode.addAttribute("ui.label", uprop.asInstanceOf[ChampionProperty].pos + " " + uprop.asInstanceOf[ChampionProperty].cname)
-    //    }
-    //
-    //    var c = 1
-    //    for (e <- graph.triplets.collect()) {
-    //      val edge = visualization.addEdge(c.toString, e.srcId.toString, e.dstId.toString, true).asInstanceOf[AbstractEdge]
-    //      c = c + 1
-    //    }
-    //
-    //    visualization.display()
-    //    graph.triplets.map(
-    //      triplet => triplet.srcAttr.asInstanceOf[UserProperty].sname + " " + triplet.attr + " " + triplet.dstAttr.asInstanceOf[ChampionProperty].cname
-    //    ).collect().foreach(println(_))
-    spark.stop()
+      //    val visualization: SingleGraph = new SingleGraph("demo")
+      //    visualization.addAttribute("ui.stylesheet", "url(./style/demoStyle.css)")
+      //    visualization.addAttribute("ui.quality")
+      //    visualization.addAttribute("ui.antialias")
+      //
+      //    for ((id, uprop) <- graph.vertices.filter { case (id, prop) => prop.isInstanceOf[UserProperty] }.collect()) {
+      //      val unode = visualization.addNode(id.toString).asInstanceOf[SingleNode]
+      //      unode.addAttribute("ui.label", uprop.asInstanceOf[UserProperty].sname)
+      //    }
+      //
+      //    for ((id, uprop) <- graph.vertices.filter { case (id, prop) => prop.isInstanceOf[ChampionProperty] }.collect()) {
+      //      val cnode = visualization.addNode(id.toString).asInstanceOf[SingleNode]
+      //      cnode.addAttribute("ui.label", uprop.asInstanceOf[ChampionProperty].pos + " " + uprop.asInstanceOf[ChampionProperty].cname)
+      //    }
+      //
+      //    var c = 1
+      //    for (e <- graph.triplets.collect()) {
+      //      val edge = visualization.addEdge(c.toString, e.srcId.toString, e.dstId.toString, true).asInstanceOf[AbstractEdge]
+      //      c = c + 1
+      //    }
+      //
+      //    visualization.display()
+      //    graph.triplets.map(
+      //      triplet => triplet.srcAttr.asInstanceOf[UserProperty].sname + " " + triplet.attr + " " + triplet.dstAttr.asInstanceOf[ChampionProperty].cname
+      //    ).collect().foreach(println(_))
+    }
+      spark.stop()
   }
 
 }
