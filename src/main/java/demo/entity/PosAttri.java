@@ -3,10 +3,13 @@ package demo.entity;
 public class PosAttri {
     private String pos;
     private double metric;
+    private Long chamPoID;
 
-    public PosAttri(String pos, double metric) {
+
+    public PosAttri(String pos, double metric, Long chamPoID) {
         this.pos = pos;
         this.metric = metric;
+        this.chamPoID = chamPoID;
     }
 
     public String getPos() {
@@ -25,4 +28,11 @@ public class PosAttri {
         this.metric = metric;
     }
 
+    public Long getChamPoID() {
+        return chamPoID;
+    }
+
+    public void setChamPoID(Long chamPoID) {
+        this.chamPoID = chamPoID;
+    }
 }
